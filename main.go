@@ -2,6 +2,6 @@ package main
 
 import "huseynovvusal/gitai/cmd"
 
-func main(){
+func main() {
 	cmd.Execute()
 }
