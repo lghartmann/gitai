@@ -1,9 +1,7 @@
 package main
 
-import (
-	"fmt"
-)
+import "huseynovvusal/gitai/cmd"
 
 func main(){
-	fmt.Println("Hello, GitAI!")
+	cmd.Execute()
 }
