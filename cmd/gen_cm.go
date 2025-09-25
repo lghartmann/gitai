@@ -22,7 +22,7 @@ var genCmCmd = &cobra.Command{
 		done := make(chan struct{})
 
 		go func() {
-			_ = prog.Start()
+			_, _ = prog.Run()
 			close(done)
 		}()
 
