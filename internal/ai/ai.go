@@ -39,3 +39,12 @@ func CallLLM(systemMessage string, userMessage string, maxTokens param.Opt[int64
 	return res.Choices[0].Message.Content, nil
 
 }
+
+func GenerateCommitMessage(diff string, status string) (string, error) {
+	systemMessage := "You are a helpful assistant that generates concise and meaningful git commit messages based on the provided git diff and status."
+	userMessage := "Generate a concise and meaningful git commit message based on the following git diff and status:\n\nGit Diff:\n" + diff + "\n\nGit Status:\n" + status
+	maxTokens := param.NewOpt[int64](60)
+	temperature := param.NewOpt(0.7)
+
+	return CallLLM(systemMessage, userMessage, maxTokens, temperature)
+}
