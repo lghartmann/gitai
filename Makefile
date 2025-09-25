@@ -5,6 +5,10 @@ all: build
 build:
 	go build -o bin/$(BINARY_NAME) main.go
 
+install:
+	go build -o bin/$(BINARY_NAME) main.go
+	sudo mv bin/$(BINARY_NAME) /usr/local/bin/
+
 test: 
 	go test ./...
 
