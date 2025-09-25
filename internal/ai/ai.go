@@ -40,8 +40,13 @@ func CallLLM(systemMessage string, userMessage string, maxTokens param.Opt[int64
 
 }
 
-func GenerateCommitMessage(diff string, status string) (string, error) {
-	systemMessage := "You are an expert software engineer specializing in writing clear, concise, and professional git commit messages. Given a git diff and status, generate a commit message that accurately summarizes the changes. Strictly output only the commit message itself, without any explanations, formatting, or additional text."
+func GenerateCommitMessage(diff string, status string, detailed bool) (string, error) {
+	var systemMessage string
+	if detailed {
+		systemMessage = "You are an expert software engineer specializing in writing clear, concise, and professional git commit messages. Given a git diff and status, generate a detailed commit message that accurately summarizes the changes. If possible, include bullet points for each significant change. Strictly output only the commit message itself, without any explanations, formatting, or additional text."
+	} else {
+		systemMessage = "You are an expert software engineer specializing in writing clear, concise, and professional git commit messages. Given a git diff and status, generate a commit message that accurately summarizes the changes. Strictly output only the commit message itself, without any explanations, formatting, or additional text."
+	}
 	userMessage := "diff: " + diff + "\n\nstatus: " + status
 	maxTokens := param.NewOpt[int64](60)
 	temperature := param.NewOpt(0.7)

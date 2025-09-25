@@ -11,6 +11,12 @@ import (
 	"huseynovvusal/gitai/internal/ui"
 )
 
+var (
+	detailed bool
+	doCommit bool
+	add      bool
+)
+
 var genCmCmd = &cobra.Command{
 	Use:     "commit_message",
 	Aliases: []string{"cm", "cmsg"},
@@ -38,15 +44,39 @@ var genCmCmd = &cobra.Command{
 			return
 		}
 
-		commitMessage, err := ai.GenerateCommitMessage(diff, status)
+		commitMessage, err := ai.GenerateCommitMessage(diff, status, detailed)
 
 		prog.Send(tea.KeyMsg{
 			Type:  tea.KeyRunes,
 			Runes: []rune("q"),
 		})
 
+		// Wait for the loader to finish
+		<-done
+
 		if err != nil {
 			fmt.Println("Error generating commit message:", err)
+			return
+		}
+
+		if add {
+			err = git.AddChanges()
+			if err != nil {
+				fmt.Println("Error adding changes:", err)
+				return
+			}
+			fmt.Println("Changes staged successfully.")
+		}
+
+		if doCommit {
+			err = git.CommitChanges(commitMessage)
+			if err != nil {
+				fmt.Println("Error committing changes:", err)
+				return
+			}
+
+			fmt.Println("Changes committed successfully.")
+
 			return
 		}
 
@@ -55,5 +85,8 @@ var genCmCmd = &cobra.Command{
 }
 
 func init() {
+	genCmCmd.Flags().BoolVar(&detailed, "detailed", false, "Generate a detailed commit message")
+	genCmCmd.Flags().BoolVar(&doCommit, "commit", false, "Commit with the generated message")
+	genCmCmd.Flags().BoolVar(&add, "add", false, "Stage all changes before committing")
 	genCmd.AddCommand(genCmCmd)
 }

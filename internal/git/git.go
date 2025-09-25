@@ -19,3 +19,19 @@ func GetStatus() (string, error) {
 
 	return string(out), err
 }
+
+func CommitChanges(message string) error {
+	cmd := exec.Command("git", "commit", "-am", message)
+
+	_, err := cmd.CombinedOutput()
+
+	return err
+}
+
+func AddChanges() error {
+	cmd := exec.Command("git", "add", ".")
+
+	_, err := cmd.CombinedOutput()
+
+	return err
+}
