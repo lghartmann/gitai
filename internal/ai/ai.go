@@ -41,8 +41,8 @@ func CallLLM(systemMessage string, userMessage string, maxTokens param.Opt[int64
 }
 
 func GenerateCommitMessage(diff string, status string) (string, error) {
-	systemMessage := "You are a helpful assistant that generates concise and meaningful git commit messages based on the provided git diff and status."
-	userMessage := "Generate a concise and meaningful git commit message based on the following git diff and status:\n\nGit Diff:\n" + diff + "\n\nGit Status:\n" + status
+	systemMessage := "You are an expert software engineer specializing in writing clear, concise, and professional git commit messages. Given a git diff and status, generate a commit message that accurately summarizes the changes. Strictly output only the commit message itself, without any explanations, formatting, or additional text."
+	userMessage := "diff: " + diff + "\n\nstatus: " + status
 	maxTokens := param.NewOpt[int64](60)
 	temperature := param.NewOpt(0.7)
 
