@@ -96,10 +96,10 @@ var genCmCmd = &cobra.Command{
 }
 
 func init() {
-	genCmCmd.Flags().BoolVar(&detailed, "detailed", false, "Generate a detailed commit message")
-	genCmCmd.Flags().BoolVar(&add, "add", false, "Stage all changes before committing")
-	genCmCmd.Flags().BoolVar(&doCommit, "commit", false, "Commit with the generated message")
-	genCmCmd.Flags().BoolVar(&push, "push", false, "Push changes after committing")
+	genCmCmd.Flags().BoolVarP(&detailed, "detailed", "d", false, "Generate a detailed commit message")
+	genCmCmd.Flags().BoolVarP(&add, "add", "a", false, "Stage all changes before committing")
+	genCmCmd.Flags().BoolVarP(&doCommit, "commit", "c", false, "Commit with the generated message")
+	genCmCmd.Flags().BoolVarP(&push, "push", "p", false, "Push changes after committing")
 
 	genCmd.AddCommand(genCmCmd)
 }
