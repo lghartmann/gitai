@@ -69,6 +69,8 @@ var genCmCmd = &cobra.Command{
 			fmt.Println("Changes staged successfully.")
 		}
 
+		fmt.Println("Generated Commit Message:\n", commitMessage)
+
 		if doCommit {
 			err = git.CommitChanges(commitMessage)
 			if err != nil {
@@ -77,8 +79,6 @@ var genCmCmd = &cobra.Command{
 			}
 
 			fmt.Println("Changes committed successfully.")
-
-			return
 		}
 
 		if push {
@@ -90,11 +90,8 @@ var genCmCmd = &cobra.Command{
 			}
 
 			fmt.Println("Changes pushed successfully.")
-
-			return
 		}
 
-		fmt.Println(commitMessage)
 	},
 }
 
