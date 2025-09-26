@@ -11,6 +11,12 @@ No more writer’s block or vague commit messages—let AI do the heavy lifting!
 
 ---
 
+## Screenshot
+
+![Gitai usage screenshot](assets/image1.png)
+
+---
+
 ## Features 🚀
 
 - **AI-Generated Commit Messages:**  
