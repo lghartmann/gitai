@@ -35,13 +35,13 @@ var genCmCmd = &cobra.Command{
 
 		diff, err := git.GetDiff()
 		if err != nil {
-			fmt.Println("Error getting git diff:", err)
+			fmt.Println("❌ Error getting git diff:", err)
 			return
 		}
 
 		status, err := git.GetStatus()
 		if err != nil {
-			fmt.Println("Error getting git status:", err)
+			fmt.Println("❌ Error getting git status:", err)
 			return
 		}
 
@@ -56,40 +56,40 @@ var genCmCmd = &cobra.Command{
 		<-done
 
 		if err != nil {
-			fmt.Println("Error generating commit message:", err)
+			fmt.Println("❌ Error generating commit message:", err)
 			return
 		}
 
 		if add {
 			err = git.AddChanges()
 			if err != nil {
-				fmt.Println("Error adding changes:", err)
+				fmt.Println("❌ Error adding changes:", err)
 				return
 			}
-			fmt.Println("Changes staged successfully.")
+			fmt.Println("✅ Changes staged successfully.")
 		}
 
-		fmt.Println("Generated Commit Message:\n", commitMessage)
+		fmt.Println("📝 Generated Commit Message:\n", commitMessage)
 
 		if doCommit {
 			err = git.CommitChanges(commitMessage)
 			if err != nil {
-				fmt.Println("Error committing changes:", err)
+				fmt.Println("❌ Error committing changes:", err)
 				return
 			}
 
-			fmt.Println("Changes committed successfully.")
+			fmt.Println("✅ Changes committed successfully.")
 		}
 
 		if push {
 			err = git.PushChanges()
 
 			if err != nil {
-				fmt.Println("Error pushing changes:", err)
+				fmt.Println("❌ Error pushing changes:", err)
 				return
 			}
 
-			fmt.Println("Changes pushed successfully.")
+			fmt.Println("🚀 Changes pushed successfully.")
 		}
 
 	},
