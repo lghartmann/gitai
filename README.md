@@ -17,10 +17,12 @@ No more writer’s block or vague commit messages—let AI do the heavy lifting!
   Generate meaningful commit messages from your git diff and status.
 - **Detailed or Concise:**  
   Use `--detailed` for a more comprehensive message.
-- **Automatic Commit & Staging:**  
-  Use `--commit` to commit instantly, and `--add` to stage all changes before committing.
+- **Automatic Staging, Commit & Push:**  
+  Use `--add` to stage all changes, `--commit` to commit instantly, and `--push` to push after committing.
 - **Interactive Loader:**  
   Enjoy a smooth CLI experience with a live spinner while AI works.
+- **Flexible Command Structure:**  
+  Use `gitai gen commit_message` (or aliases like `cm`, `cmsg`) for commit message generation.
 
 ---
 
@@ -57,7 +59,7 @@ No more writer’s block or vague commit messages—let AI do the heavy lifting!
 
 ## Installation 🏗️
 
-### 1. Build from Source
+### 1. Build and Install
 
 ```sh
 git clone https://github.com/yourusername/gitai.git
@@ -67,10 +69,11 @@ make install
 
 This will build and move the `gitai` binary to `/usr/local/bin/`.
 
-### 2. Or Add to Your PATH
+### 2. Or Build Locally
 
 ```sh
-export PATH="$PATH:/path/to/gitai/bin"
+make build
+# Then run from ./bin/gitai or add ./bin to your PATH
 ```
 
 ---
@@ -81,22 +84,40 @@ export PATH="$PATH:/path/to/gitai/bin"
 gitai gen commit_message [flags]
 ```
 
-### Common Flags
-
-- `--detailed`  
-  Generate a more detailed commit message.
-- `--commit`  
-  Commit with the generated message.
-- `--add`  
-  Stage all changes before committing.
-
-### Examples
+or using aliases:
 
 ```sh
-gitai gen commit_message --detailed
-gitai gen commit_message --commit
-gitai gen commit_message --add --commit
+gitai gen cm [flags]
+gitai gen cmsg [flags]
 ```
+
+### Common Flags
+
+- `--detailed, -d`  
+  Generate a more detailed commit message.
+- `--add, -a`  
+  Stage all changes before generating the commit message.
+- `--commit, -c`  
+  Commit with the generated message.
+- `--push, -p`  
+  Push changes after committing.
+
+### Shorthand Usage Examples
+
+You can combine short flags for convenience:
+
+```sh
+gitai gen cm -d
+gitai gen cm -a -c
+gitai gen cm -a -c -p
+gitai gen cm -cap   # Equivalent to --add --commit --push
+```
+
+---
+
+## Interactive Loader
+
+While the AI generates your commit message, Gitai displays a live spinner for a smooth CLI experience.
 
 ---
 
