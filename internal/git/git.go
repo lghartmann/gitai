@@ -35,3 +35,11 @@ func AddChanges() error {
 
 	return err
 }
+
+func PushChanges() error {
+	cmd := exec.Command("git", "push")
+
+	_, err := cmd.CombinedOutput()
+
+	return err
+}

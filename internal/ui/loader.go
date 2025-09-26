@@ -49,7 +49,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m model) View() string {
 	if m.done {
-		return "Done!\n"
+		return ""
 	}
 
 	return "Loading" + m.spinner.View()

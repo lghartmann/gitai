@@ -15,6 +15,7 @@ var (
 	detailed bool
 	doCommit bool
 	add      bool
+	push     bool
 )
 
 var genCmCmd = &cobra.Command{
@@ -80,13 +81,28 @@ var genCmCmd = &cobra.Command{
 			return
 		}
 
+		if push {
+			err = git.PushChanges()
+
+			if err != nil {
+				fmt.Println("Error pushing changes:", err)
+				return
+			}
+
+			fmt.Println("Changes pushed successfully.")
+
+			return
+		}
+
 		fmt.Println(commitMessage)
 	},
 }
 
 func init() {
 	genCmCmd.Flags().BoolVar(&detailed, "detailed", false, "Generate a detailed commit message")
-	genCmCmd.Flags().BoolVar(&doCommit, "commit", false, "Commit with the generated message")
 	genCmCmd.Flags().BoolVar(&add, "add", false, "Stage all changes before committing")
+	genCmCmd.Flags().BoolVar(&doCommit, "commit", false, "Commit with the generated message")
+	genCmCmd.Flags().BoolVar(&push, "push", false, "Push changes after committing")
+
 	genCmd.AddCommand(genCmCmd)
 }
