@@ -43,18 +43,18 @@ func AddChanges() error {
 
 // GetChangedFiles returns a list of changed files using `git status --porcelain`.
 func GetChangedFiles() ([]string, error) {
-    out, err := exec.Command("git", "status", "--porcelain").Output()
-    if err != nil {
-        return nil, err
-    }
-    lines := strings.Split(string(out), "\n")
-    var files []string
-    for _, line := range lines {
-        if len(line) > 3 {
-            files = append(files, strings.TrimSpace(line[3:]))
-        }
-    }
-    return files, nil
+	out, err := exec.Command("git", "status", "--porcelain").Output()
+	if err != nil {
+		return nil, err
+	}
+	lines := strings.Split(string(out), "\n")
+	var files []string
+	for _, line := range lines {
+		if len(line) > 3 {
+			files = append(files, strings.TrimSpace(line[3:]))
+		}
+	}
+	return files, nil
 }
 
 // GetChangesForFiles returns the git diff for the specified files.
@@ -67,17 +67,17 @@ func GetChangesForFiles(files []string) (string, error) {
 
 // Commit stages the selected files and creates a commit with the given message.
 func Commit(files []string, message string) error {
-    args := append([]string{"add"}, files...)
-    if err := exec.Command("git", args...).Run(); err != nil {
-        return err
-    }
-    if err := exec.Command("git", "commit", "-m", message).Run(); err != nil {
-        return err
-    }
-    return nil
+	args := append([]string{"add"}, files...)
+	if err := exec.Command("git", args...).Run(); err != nil {
+		return err
+	}
+	if err := exec.Command("git", "commit", "-m", message).Run(); err != nil {
+		return err
+	}
+	return nil
 }
 
 // Push pushes the current branch to the remote repository.
 func Push() error {
-    return exec.Command("git", "push").Run()
+	return exec.Command("git", "push").Run()
 }
