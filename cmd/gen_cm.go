@@ -82,7 +82,7 @@ var genCmCmd = &cobra.Command{
 		}
 
 		if push {
-			err = git.PushChanges()
+			err = git.Push()
 
 			if err != nil {
 				fmt.Println("❌ Error pushing changes:", err)
