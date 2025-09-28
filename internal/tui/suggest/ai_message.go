@@ -62,6 +62,7 @@ func NewAIMessageModel(files []string) AIMessageModel {
 func runAIAsync(files []string) tea.Cmd {
 	return func() tea.Msg {
 		diff, err := git.GetChangesForFiles(files)
+
 		if err != nil {
 			panic(err)
 		}

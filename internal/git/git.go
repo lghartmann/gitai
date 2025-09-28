@@ -1,6 +1,7 @@
 package git
 
 import (
+	"fmt"
 	"os/exec"
 	"strings"
 )
@@ -59,7 +60,27 @@ func GetChangedFiles() ([]string, error) {
 
 // GetChangesForFiles returns the git diff for the specified files.
 func GetChangesForFiles(files []string) (string, error) {
-	args := append([]string{"diff", "--"}, files...)
+	// Trim whitespace and remove empty entries to avoid calling
+	// `git diff --` with no paths (which returns the full diff).
+	var clean []string
+	for _, f := range files {
+		f = strings.TrimSpace(f)
+		if f == "" {
+			continue
+		}
+		clean = append(clean, f)
+	}
+
+	if len(clean) == 0 {
+		// No files specified — return empty diff instead of full repo diff.
+		return "", nil
+	}
+
+	args := append([]string{"diff", "--"}, clean...)
+
+	// ! Debug
+	fmt.Println("Git args:", args)
+
 	out, err := exec.Command("git", args...).Output()
 
 	return string(out), err

@@ -54,9 +54,15 @@ func (m *FileSelectorModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case " ":
 			m.selected[m.cursor] = !m.selected[m.cursor]
 		case "a":
-			all := len(m.selected) < len(m.files)
+			var all = true
 			for i := range m.files {
-				m.selected[i] = all
+				if !m.selected[i] {
+					all = false
+					break
+				}
+			}
+			for i := range m.files {
+				m.selected[i] = !all
 			}
 		case "enter":
 			if m.anySelected() {

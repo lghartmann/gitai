@@ -27,14 +27,19 @@ func RunSuggestFlow() {
 		return
 	}
 
-	// TODO: Show error message if no files selected
+	selectedFiles := []string{}
+	for i := range fileSelectorModel.files {
+		if fileSelectorModel.selected[i] {
+			selectedFiles = append(selectedFiles, fileSelectorModel.files[i])
+		}
+	}
 
-	if len(fileSelectorModel.files) == 0 {
+	if len(selectedFiles) == 0 {
 		println("No files selected.")
 		return
 	}
 
-	aiModel := NewAIMessageModel(fileSelectorModel.files)
+	aiModel := NewAIMessageModel(selectedFiles)
 	aiModelProgram := tea.NewProgram(&aiModel)
 
 	_, err = aiModelProgram.Run()
