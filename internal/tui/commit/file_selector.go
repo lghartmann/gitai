@@ -76,6 +76,20 @@ func (m *FileSelectorModel) View() string {
 
 	var b strings.Builder
 
+	if m.done {
+		header := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("69")).Render("Selected files for commit:")
+		b.WriteString("\n" + header + "\n")
+
+		for i, file := range m.files {
+			if m.selected[i] {
+				line := fmt.Sprintf(" - %s", fileStyle.Render(file))
+				b.WriteString(line + "\n")
+			}
+		}
+
+		return b.String()
+	}
+
 	header := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("69")).Render("Select files to include in commit:")
 	b.WriteString("\n" + header + "\n")
 
