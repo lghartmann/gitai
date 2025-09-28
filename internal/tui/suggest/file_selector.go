@@ -1,4 +1,4 @@
-package commit
+package suggest
 
 import (
 	"fmt"

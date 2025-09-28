@@ -40,13 +40,14 @@ func CallLLM(systemMessage string, userMessage string, maxTokens param.Opt[int64
 
 }
 
-func GenerateCommitMessage(diff string, status string, detailed bool) (string, error) {
-	var systemMessage string
-	if detailed {
-		systemMessage = "You are an expert software engineer specializing in writing clear, concise, and professional git commit messages. Given a git diff and status, generate a detailed commit message that accurately summarizes the changes. If possible, include bullet points for each significant change. Strictly output only the commit message itself, without any explanations, formatting, or additional text."
-	} else {
-		systemMessage = "You are an expert software engineer specializing in writing clear, concise, and professional git commit messages. Given a git diff and status, generate a commit message that accurately summarizes the changes. Strictly output only the commit message itself, without any explanations, formatting, or additional text."
-	}
+func GenerateCommitMessage(diff string, status string) (string, error) {
+	systemMessage := `You are an expert software engineer. Given a git diff and git status, produce one or more candidate commit messages following Conventional Commits format. Output only the commit message(s), nothing else. Rules:
+
+Use types: feat, fix, docs, style, refactor, perf, test, chore.
+Optionally include a scope in parentheses (e.g., feat(auth):).
+Subject must be imperative, ≤ 50 characters (try to stay short).
+If needed, include a 1-2 paragraph body (wrap at ~72 chars) that explains why the change was made and any important context or migration steps.`
+
 	userMessage := "diff: " + diff + "\n\nstatus: " + status
 	maxTokens := param.NewOpt[int64](60)
 	temperature := param.NewOpt(0.7)
