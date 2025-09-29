@@ -37,7 +37,7 @@ func AddChanges() error {
 }
 
 func PushChanges() error {
-	cmd := exec.Command("git", "push")
+	cmd := exec.Command("git", "push", "origin", "$(git branch --show-current)")
 
 	_, err := cmd.CombinedOutput()
 
