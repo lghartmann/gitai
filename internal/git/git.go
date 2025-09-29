@@ -39,7 +39,6 @@ func AddChanges() error {
 }
 
 func PushChanges() error {
-
 	branchCmd := exec.Command("git", "branch", "--show-current")
 	branchOutput, err := branchCmd.Output()
 	if err != nil {
