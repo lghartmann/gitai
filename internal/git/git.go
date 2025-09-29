@@ -1,6 +1,7 @@
 package git
 
 import (
+	"fmt"
 	"os/exec"
 )
 
@@ -37,6 +38,7 @@ func AddChanges() error {
 }
 
 func PushChanges() error {
+	fmt.Println("test push")
 	cmd := exec.Command("git", "push", "origin", "$(git branch --show-current)")
 
 	_, err := cmd.CombinedOutput()
