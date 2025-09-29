@@ -11,6 +11,7 @@ import (
 	"github.com/openai/openai-go/v2"
 	"github.com/openai/openai-go/v2/option"
 	"github.com/openai/openai-go/v2/packages/param"
+	"google.golang.org/genai"
 )
 
 func CallGPT(systemMessage string, userMessage string, maxTokens param.Opt[int64], temperature param.Opt[float64]) (string, error) {
@@ -44,9 +45,46 @@ func CallGPT(systemMessage string, userMessage string, maxTokens param.Opt[int64
 
 }
 
+func CallGemini(systemMessage string, userMessage string, maxTokens int32, temperature float32) (string, error) {
+	apiKey := os.Getenv("GOOGLE_API_KEY")
+
+	client, err := genai.NewClient(context.TODO(), &genai.ClientConfig{
+		APIKey: apiKey,
+	})
+	if err != nil {
+		return "", err
+	}
+
+	parts := []*genai.Part{
+		{
+			Text: systemMessage,
+		},
+		{
+			Text: userMessage,
+		},
+	}
+	modelConfig := genai.GenerateContentConfig{Temperature: &temperature, MaxOutputTokens: maxTokens}
+
+	result, err := client.Models.GenerateContent(context.TODO(), "gemini-2.0-flash", []*genai.Content{
+		{
+			Parts: parts,
+		},
+	}, &modelConfig)
+	if err != nil {
+		return "", err
+	}
+
+	if len(result.Candidates) == 0 {
+		return "", ErrNoResponse
+	}
+
+	return result.Candidates[0].Content.Parts[0].Text, nil
+
+}
+
 func CallOllama(systemMessage string, userMessage string) (string, error) {
-	// apiPath, _ := os.LookupEnv("OLLAMA_API_PATH")
-	apiPath := "/usr/local/bin/ollama"
+	// apiPath := "/usr/local/bin/ollama"
+	apiPath := os.Getenv("OLLAMA_API_PATH")
 
 	if apiPath == "" {
 		return "", fmt.Errorf("ollama binary not found in PATH")
@@ -83,5 +121,6 @@ func GenerateCommitMessage(diff string, status string) (string, error) {
 	// temperature := param.NewOpt(0.7)
 
 	// return CallGPT(systemMessage, userMessage, maxTokens, temperature)
-	return CallOllama(systemMessage, userMessage)
+	// return CallOllama(systemMessage, userMessage)
+	return CallGemini(systemMessage, userMessage, 256, 0.7)
 }
