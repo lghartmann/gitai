@@ -3,6 +3,7 @@ package git
 import (
 	"fmt"
 	"os/exec"
+	"strings"
 )
 
 func GetDiff() (string, error) {
@@ -38,10 +39,19 @@ func AddChanges() error {
 }
 
 func PushChanges() error {
-	fmt.Println("test push")
-	cmd := exec.Command("git", "push", "origin", "$(git branch --show-current)")
 
-	_, err := cmd.CombinedOutput()
+	branchCmd := exec.Command("git", "branch", "--show-current")
+	branchOutput, err := branchCmd.Output()
+	if err != nil {
+		return fmt.Errorf("failed to get current branch: %w", err)
+	}
+
+	currentBranch := strings.TrimSpace(string(branchOutput))
+	pushCmd := exec.Command("git", "push", "origin", currentBranch)
+	output, err := pushCmd.CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("push failed: %w\nOutput: %s", err, string(output))
+	}
 
 	return err
 }
