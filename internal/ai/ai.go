@@ -2,7 +2,6 @@ package ai
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -55,56 +54,50 @@ func GenerateCommitMessage(diff string, status string, detailed bool) (string, e
 	maxTokens := param.NewOpt[int64](60)
 	temperature := param.NewOpt(0.7)
 
-	err := checkDiffSafety(diff)
-	if err != nil {
-		return "", err
-	}
-
 	return CallLLM(systemMessage, userMessage, maxTokens, temperature)
 }
 
-func checkDiffSafety(diffText string) (err error) {
+func CheckDiffSafety(diffText string) (sensitiveData []string, err error) {
 	fileDiffs, err := diff.ParseMultiFileDiff([]byte(diffText))
 	if err != nil {
-		fmt.Printf("Error parsing diff: %v\n", err)
-		return
+		return nil, nil
 	}
 
-fileDiffLoop:
+	var foundSensitive []string
+
 	for _, fileDiff := range fileDiffs {
 		for _, hunk := range fileDiff.Hunks {
-			for _, line := range hunk.Body {
-				if strings.HasPrefix(string(line), "+") && !strings.HasPrefix(string(line), "+++") {
-					content := strings.TrimPrefix(string(line), "+")
+			lines := strings.Split(string(hunk.Body), "\n")
+
+			newLineNum := int(hunk.NewStartLine)
+
+			for _, line := range lines {
+				if line == "" {
+					continue
+				}
+
+				if strings.HasPrefix(line, "+") && !strings.HasPrefix(line, "+++") {
+					content := strings.TrimPrefix(line, "+")
 
 					if containsSensitiveData(content) {
-						warning := fmt.Sprintf("⚠️  WARNING: Potential sensitive data detected in %s: %s\n",
-							fileDiff.NewName, strings.TrimSpace(content))
-
-						fmt.Println(warning)
-
-						var option string
-						fmt.Print("Are you sure you want to continue? [Y/n]")
-						fmt.Scanln(&option)
-
-						switch strings.ToLower(option) {
-						case "", "y", "yes":
-							continue
-						case "n", "no":
-							err = errors.New(warning)
-							break fileDiffLoop
-						}
+						relativeFile := strings.TrimPrefix(fileDiff.NewName, "b/")
+						relativeFile = strings.TrimPrefix(relativeFile, "a/")
+						clickableFile := fmt.Sprintf("%s:%d:1", relativeFile, newLineNum)
+						sensitive := fmt.Sprintf("%s: %s", clickableFile, strings.TrimSpace(content))
+						foundSensitive = append(foundSensitive, sensitive)
 					}
+					newLineNum++
+				} else if strings.HasPrefix(line, " ") {
+					newLineNum++
 				}
 			}
 		}
 	}
-	return
+	return foundSensitive, nil
 }
 
-func containsSensitiveData(content string) bool {
+func containsSensitiveData(content string) (isSensitive bool) {
 	lower := strings.ToLower(content)
-	fmt.Printf("DEBUG: Checking if sensitive: %q\n", lower)
 
 	sensitivePatterns := []string{
 		"password", "passwd", "pwd",
@@ -118,10 +111,10 @@ func containsSensitiveData(content string) bool {
 
 	for _, pattern := range sensitivePatterns {
 		if strings.Contains(lower, pattern) {
-			return true
+			isSensitive = true
+			return
 		}
 	}
 
-	fmt.Println("DEBUG: No sensitive patterns found")
-	return false
+	return
 }

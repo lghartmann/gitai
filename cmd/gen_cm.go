@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/AlecAivazis/survey/v2"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/spf13/cobra"
 
@@ -24,15 +25,6 @@ var genCmCmd = &cobra.Command{
 	Short:   "Generate commit messages using AI",
 	Long:    `The commit_message command leverages AI to generate meaningful and concise commit messages based on the changes in your repository.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		loaderModel := ui.NewLoaderModel()
-		prog := tea.NewProgram(loaderModel)
-		done := make(chan struct{})
-
-		go func() {
-			_, _ = prog.Run()
-			close(done)
-		}()
-
 		diff, err := git.GetDiff()
 		if err != nil {
 			fmt.Println("❌ Error getting git diff:", err)
@@ -45,14 +37,54 @@ var genCmCmd = &cobra.Command{
 			return
 		}
 
+		// Check for sensitive data before starting any loaders
+		sensitiveData, err := ai.CheckDiffSafety(diff)
+		if err != nil {
+			fmt.Println("❌ Error checking diff safety:", err)
+			return
+		}
+
+		if len(sensitiveData) > 0 {
+			// Show warnings
+			fmt.Println("⚠️  WARNING: Potential sensitive data detected:")
+			for _, data := range sensitiveData {
+				fmt.Printf("  - %s\n", data)
+			}
+
+			proceed := false
+			prompt := &survey.Confirm{
+				Message: "Do you want to proceed with the commit?",
+				Default: false,
+			}
+			err := survey.AskOne(prompt, &proceed)
+			if err != nil {
+				fmt.Println("❌ Error reading input:", err)
+				return
+			}
+
+			if !proceed {
+				fmt.Println("Commit generation canceled.")
+				return
+			}
+		}
+
+		// Only start the loader for the AI call (the slow part)
+		loaderModel := ui.NewLoaderModel()
+		prog := tea.NewProgram(loaderModel)
+		done := make(chan struct{})
+
+		go func() {
+			_, _ = prog.Run()
+			close(done)
+		}()
+
 		commitMessage, err := ai.GenerateCommitMessage(diff, status, detailed)
 
+		// Stop the loader
 		prog.Send(tea.KeyMsg{
 			Type:  tea.KeyRunes,
 			Runes: []rune("q"),
 		})
-
-		// Wait for the loader to finish
 		<-done
 
 		if err != nil {
